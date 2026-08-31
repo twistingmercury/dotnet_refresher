@@ -12,5 +12,8 @@ help: ## Show this help
 run: ## Run the app locally
 	dotnet run --project src/Orders/Orders.csproj
 
+compose:
+	docker compose up
+
 build: ## Build the application
 	LOCAL=1 ./build/build.sh
