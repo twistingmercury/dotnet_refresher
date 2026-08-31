@@ -1,7 +1,6 @@
 services:
   orders_api:
     image: ghcr.io/twistingmercury/orders:latest
-    pull: never
     ports:
       - "3033:8080"
     environment:

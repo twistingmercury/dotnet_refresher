@@ -10,7 +10,7 @@ help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_-]+:.*##/ { printf "  %-20s %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 run: ## Run the app locally
-	docker compose up --remove-orphans
+	dotnet run --project src/Orders/Orders.csproj
 
 build: ## Build the application
 	LOCAL=1 ./build/build.sh
