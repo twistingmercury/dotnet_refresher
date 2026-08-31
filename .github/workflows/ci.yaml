@@ -35,7 +35,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run containerized build
-        run: ./build/build.sh
+        run: LOCAL=0 ./build/build.sh
 
       - name: Push image tags
         run: |
