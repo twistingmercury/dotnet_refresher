@@ -4,7 +4,7 @@ WORKDIR /src
 COPY src/Orders/ ./Orders/
 WORKDIR /src/Orders
 
-RUN dotnet restore --runtime linux-musl-x64 -p:PublishAot=true --locked-mode
+RUN dotnet restore --runtime linux-musl-x64 -p:PublishAot=true
 RUN dotnet format --verify-no-changes --no-restore
 RUN dotnet build --runtime linux-musl-x64 --no-restore --configuration Release -warnaserror
 RUN dotnet test --runtime linux-musl-x64 --no-build --configuration Release
