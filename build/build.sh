@@ -20,9 +20,9 @@ if [ ${LOCAL} = 1 ]; then
 fi
 
 clean_up(){
-    if [ ${LOCAL} = 1 ]; then
-        docker rmi "${IMAGE_NAME}":latest -f > /dev/null 2>&1 || true
-    fi
+    # if [ ${LOCAL} = 1 ]; then
+    #     docker rmi "${IMAGE_NAME}":latest -f > /dev/null 2>&1 || true
+    # fi
     return 0
 }
 
@@ -31,8 +31,8 @@ build(){
         --file "${SCRIPT_DIR}/Dockerfile" \
         --rm --no-cache \
         --build-arg BUILD_VER="${BUILD_VER}" \
-        --build-arg BUILD_VER="${BUILD_DATE}" \
-        --build-arg BUILD_VER="${BUILD_COMMIT}" \
+        --build-arg BUILD_DATE="${BUILD_DATE}" \
+        --build-arg BUILD_COMMIT="${BUILD_COMMIT}" \
         --target final \
         --tag "${IMAGE_NAME}:latest" \
         --tag "${IMAGE_NAME}:${BUILD_VER}" .

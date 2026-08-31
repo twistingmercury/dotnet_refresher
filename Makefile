@@ -13,4 +13,4 @@ run: ## Run the app locally
 	docker compose up --remove-orphans
 
 build: ## Build the application
-	LOCAL=1 ./build/build.sh
+	./build/build.sh
