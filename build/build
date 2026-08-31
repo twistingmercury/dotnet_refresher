@@ -13,7 +13,7 @@ BUILD_DATE="${BUILD_DATE:-$(date -u +%Y-%m-%dT%H:%M:%SZ)}"
 BUILD_COMMIT="${BUILD_COMMIT:-$(git -C "${PROJ_ROOT}" rev-parse --short HEAD 2>/dev/null || echo 'unknown')}"
 
 IMAGE_NAME="${IMAGE_NAME:-ghcr.io/twistingmercury/orders}"
-IMAGE_TAG="${BUILD_VER}"
+IMAGE_TAG="${IMAGE_TAG:-$BUILD_VER}"
 
 if [ ${LOCAL} = 1 ]; then
     IMAGE_TAG="${IMAGE_TAG}-local"
@@ -28,16 +28,12 @@ clean_up(){
 
 build(){
     docker build \
-        --file "${SCRIPT_DIR}/Dockerfile" \
         --rm --no-cache \
         --build-arg BUILD_VER="${BUILD_VER}" \
         --build-arg BUILD_VER="${BUILD_DATE}" \
         --build-arg BUILD_VER="${BUILD_COMMIT}" \
-        --target final \
         --tag "${IMAGE_NAME}:latest" \
-        --tag "${IMAGE_NAME}:${BUILD_VER}" .
-
-        return 0
+        --tag "${IMAGE_NAME}:BUILD_VER" .
 }
 
 main(){
@@ -49,8 +45,6 @@ main(){
     trap clean_up EXIT
 
     build
-
-    return 0
 }
 
 main "@$"

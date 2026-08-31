@@ -13,4 +13,4 @@ run: ## Run the app locally
 	dotnet run --project ./src/Orders
 
 build: ## Build the application
-	./build/build.sh
+	LOCAL=1 ./build/build.sh
