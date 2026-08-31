@@ -40,7 +40,6 @@ jobs:
       - name: Push image tags
         run: |
           VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo 'dev')
-
           docker push ghcr.io/twistingmercury/orders:latest
           docker push ghcr.io/twistingmercury/orders:${VERSION}
          
