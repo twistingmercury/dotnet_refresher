@@ -26,6 +26,8 @@ LABEL org.opencontainers.image.title="Orders" \
     org.opencontainers.image.revision="${BUILD_COMMIT}" \
     org.opencontainers.image.version="${BUILD_VER}"
 
+EXPOSE 8080
+
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["./Orders"]
