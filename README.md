@@ -16,7 +16,7 @@ Agenting coding will only be used in an advisory capacity, not in generating cod
 Spent the day working on a docker-first build...like I would in Go. What I accomplished:
 
 - Focused on stubbing out a web api that compiled using Native AOT.
-- A [Dockerfile](build/Dockerfile) that builds, tests, runs analysis (Kind of,,,not like Go tooling), and pushed the images to GHCR.
+- A [Dockerfile](build/Dockerfile) that builds, tests, runs analysis (Kind of...not like Go tooling), and pushed the images to GHCR.
 - A [build script](build/build.sh) that performs the build. It's used to both build locally and in the [CI build](.github/workflows/ci.yaml).
 - A simple [Makefile](./Makefile)
 - The start of [docker compose file](./docker-compose.yaml).
