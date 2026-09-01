@@ -19,18 +19,18 @@ RUN dotnet publish \
 
 FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-alpine AS final
 
-ARG BUILD_VER=dev
-ARG BUILD_DATE=unknown
-ARG BUILD_COMMIT=unknown
+ARG VERSION=dev
+ARG DATE=unknown
+ARG COMMIT=unknown
 
 LABEL org.opencontainers.image.title="Orders" \
     org.opencontainers.image.description="This project is simply a project to refamilarize myself with modern .NET development." \
     org.opencontainers.image.source="https://github.com/twistingmercury/dotnet-refresher" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.authors="Jeremy K. Johnson" \
-    org.opencontainers.image.created="${BUILD_DATE}" \
-    org.opencontainers.image.revision="${BUILD_COMMIT}" \
-    org.opencontainers.image.version="${BUILD_VER}"
+    org.opencontainers.image.created="${DATE}" \
+    org.opencontainers.image.revision="${COMMIT}" \
+    org.opencontainers.image.version="${VERSION}"
 
 EXPOSE 8080
 
