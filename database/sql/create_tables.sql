@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS orders (
+    order_id UUID PRIMARY KEY,
+    customer_name TEXT NOT NULL,
+    created_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS order_details (
+    order_id UUID NOT NULL REFERENCES orders (order_id) ON DELETE CASCADE,
+    line_number INTEGER NOT NULL,
+    product_name TEXT NOT NULL,
+    qty INTEGER NOT NULL CHECK (qty > 0),
+    created_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (order_id, line_number)
+);

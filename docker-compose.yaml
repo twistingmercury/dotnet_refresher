@@ -10,7 +10,7 @@ services:
     environment:
       ASPNETCORE_URLS: http://+:8080
       DB_USER: ordersUser
-      DB_PASS: ordersUser
+      DB_PASS: ordersPass
       DOTNET_USE_POLLING_FILE_WATCHER: 1
     networks:
       - orders_network
@@ -23,8 +23,8 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: ordersUser
-      POSTGRES_PASSWORD: ordersUser
-      POSTGRES_DB: orders
+      POSTGRES_PASSWORD: ordersPass
+      # POSTGRES_DB: orders
     ports:
       - "6432:5432"
     volumes:
@@ -32,7 +32,7 @@ services:
     networks:
       - orders_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ordersUser"]
+      test: ["CMD-SHELL", "pg_isready -U ordersUser -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
