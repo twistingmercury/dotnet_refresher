@@ -21,6 +21,14 @@ Spent the day working on a docker-first build...like I would in Go. What I accom
 - A simple [Makefile](./Makefile)
 - The start of [docker compose file](./docker-compose.yaml).
 
+## Tuesday, Sep 01, 2026
+
+Didn't work on this today.
+
+## Wednesday, Sep 02, 2026
+
+Didn't work on this today. Worked on a super secret, supremely cool, yet obsurdly ambitious (for me) project 😶
+
 ## Thursday, Set 03, 2026
 
 Spent the day fleshing out the data access and finishing up the endpoints.
