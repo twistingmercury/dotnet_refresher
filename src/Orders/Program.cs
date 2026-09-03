@@ -1,3 +1,5 @@
+using Orders.Endpoints;
+
 namespace Orders;
 
 public class Program
@@ -6,11 +8,13 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddOpenApi();
+        // builder.Services.AddOpenApi();
 
         var app = builder.Build();
 
         app.MapGet("/", () => "Hello World!");
+
+        app.MapOrderEvents();
 
         app.Run();
     }

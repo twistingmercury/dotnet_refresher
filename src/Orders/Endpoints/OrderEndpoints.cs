@@ -1,24 +1,46 @@
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Orders.Models;
+
 namespace Orders.Endpoints;
 
 public static class OrderEndpoints
 {
-    public static async Task<IResult> GetOrderAsync()
+    public static IEndpointRouteBuilder MapOrderEvents(this IEndpointRouteBuilder endpoints)
     {
-        return Results.StatusCode(StatusCodes.Status501NotImplemented);
+        var groups = endpoints
+            .MapGroup("/orders")
+            .WithTags("Orders");
+
+        groups.MapGet("/get/{id:guid}", GetOrderAsync);
+
+        groups.MapPost("/create", CreateOrderAscync);
+
+        groups.MapDelete("/delete/{id:guid}", DeleteOrderAsync);
+
+        return endpoints;
     }
 
-    public static async Task<IResult> CreateOrderAscync()
+    public static async Task<Results<Ok<GetOrderResponse>, NotFound, ProblemHttpResult>> GetOrderAsync(GetOrderRequest orderRequest)
     {
-        return Results.StatusCode(StatusCodes.Status501NotImplemented);
+        return TypedResults.Problem(
+            statusCode: StatusCodes.Status501NotImplemented,
+            title: "GetOrderAsync not implemented");
     }
 
-    public static async Task<IResult> PutOrderAscync()
+    public static async Task<IResult> CreateOrderAscync(CreateOrderRequest createRequest)
     {
-        return Results.StatusCode(StatusCodes.Status501NotImplemented);
+        return TypedResults.Problem(
+            statusCode: StatusCodes.Status501NotImplemented,
+            title: "GetOrderAsync not implemented");
     }
 
-    public static async Task<IResult> DeleteOrderAscync()
+    public static async Task<IResult> DeleteOrderAsync(DeleteOrderRequest deleteRequest)
     {
-        return Results.StatusCode(StatusCodes.Status501NotImplemented);
+        return TypedResults.Problem(
+            statusCode: StatusCodes.Status501NotImplemented,
+            title: "GetOrderAsync not implemented");
     }
 }

@@ -22,5 +22,5 @@ dotnet package list \
 printf "\n%s\n"  "Checking for compiler warnings..."
 dotnet build "${SRC_ROOT}" \
     --no-restore \
-    --configuration Release \
+    --configuration Debug \
     -warnaserror

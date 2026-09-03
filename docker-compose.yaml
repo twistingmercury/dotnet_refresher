@@ -4,7 +4,43 @@ services:
       context: .
       dockerfile: build/Dockerfile
     image: ghcr.io/twistingmercury/orders:local-build
+    restart: unless-stopped
     ports:
       - "3033:8080"
     environment:
-      - ASPNETCORE_URLS=http://+:8080
+      ASPNETCORE_URLS: http://+:8080
+      DB_USER: ordersUser
+      DB_PASS: ordersUser
+      DOTNET_USE_POLLING_FILE_WATCHER: 1
+    networks:
+      - orders_network
+    depends_on:
+      - orders_pg_db
+      
+  orders_pg_db:
+    image: postgres:18.6-alpine3.24
+    container_name: orders_pg_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ordersUser
+      POSTGRES_PASSWORD: ordersUser
+      POSTGRES_DB: orders
+    ports:
+      - "6432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - orders_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ordersUser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+volumes:
+  postgres_data:
+
+networks:
+  orders_network:
+    driver: bridge
