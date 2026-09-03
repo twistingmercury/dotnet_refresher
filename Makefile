@@ -20,3 +20,6 @@ compose: ## Runs docker compose to build and run the app locally in a container.
 
 build: ## Build the application using the same script that is used for the CI build.
 	@LOCAL=1 ./build/build.sh
+
+start-db: ## Starts up just the database
+	docker compose start orders_pg_db
