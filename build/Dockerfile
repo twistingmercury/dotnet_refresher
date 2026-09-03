@@ -1,23 +1,20 @@
-FROM mcr.microsoft.com/dotnet/sdk:10.0.400-alpine3.24-aot AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0.400-alpine3.24 AS build
 
 WORKDIR /src
 COPY src/Orders/ ./Orders/
 WORKDIR /src/Orders
 
-RUN dotnet restore --runtime linux-musl-x64 -p:PublishAot=true
+RUN dotnet restore
 RUN dotnet format --verify-no-changes --no-restore
-RUN dotnet build --runtime linux-musl-x64 --no-restore --configuration Release -warnaserror
-RUN dotnet test --runtime linux-musl-x64 --no-build --configuration Release
+RUN dotnet build --no-restore --configuration Release -warnaserror
+RUN dotnet test --no-build --configuration Release
 RUN dotnet package list --no-restore --vulnerable --include-transitive
 RUN dotnet publish \
-    --runtime linux-musl-x64 \
-    --self-contained true \
-    -p:PublishAot=true \
     --no-restore \
     --configuration Release \
     --output /app/publish
 
-FROM mcr.microsoft.com/dotnet/runtime-deps:10.0-alpine AS final
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-alpine AS final
 
 ARG VERSION=dev
 ARG DATE=unknown
@@ -36,4 +33,4 @@ EXPOSE 8080
 
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["./Orders"]
+ENTRYPOINT ["dotnet", "Orders.dll"]

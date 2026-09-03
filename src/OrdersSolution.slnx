@@ -1,10 +1,10 @@
 <Solution>
-  <Folder Name="/Tests/" />
-  <Folder Name="/Tests/BlackBox/">
-    <Project Path="Tests/BlackBox/Orders.Tests.BlackBox.csproj" />
-  </Folder>
-  <Folder Name="/Tests/Unit/">
-    <Project Path="Tests/Unit/Orders.Tests.Unit.csproj" />
-  </Folder>
-  <Project Path="Orders/Orders.csproj" />
+    <Folder Name="/Tests/"/>
+    <Folder Name="/Tests/BlackBox/">
+        <Project Path="Tests/BlackBox/Orders.Tests.BlackBox.csproj"/>
+    </Folder>
+    <Folder Name="/Tests/Unit/">
+        <Project Path="Tests/Unit/Orders.Tests.Unit.csproj"/>
+    </Folder>
+    <Project Path="Orders/Orders.csproj"/>
 </Solution>

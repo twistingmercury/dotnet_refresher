@@ -1,4 +1,7 @@
+using Orders.DataAccess;
 using Orders.Endpoints;
+using Microsoft.EntityFrameworkCore;
+using Orders.Handlers;
 
 namespace Orders;
 
@@ -8,7 +11,12 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // builder.Services.AddOpenApi();
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+        builder.Services.AddDbContextPool<OrderDbContext>(options =>
+            options.UseNpgsql(connectionString));
+
+        builder.Services.AddScoped<IOrderHandler, OrderHandler>();
 
         var app = builder.Build();
 
