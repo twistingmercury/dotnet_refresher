@@ -7,7 +7,7 @@ Agenting coding will only be used in an advisory capacity, not in generating cod
 ---
 
 > Maturity: Emerging  
-> Version: 0.0.1
+> Version: 0.1.4
 
 ---
 
