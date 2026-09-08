@@ -23,12 +23,19 @@ make test-blackbox
 
 This target calls [`build/test-black-box.sh`](../../build/test-black-box.sh),
 which builds the images, runs the tests, and removes the test containers and
-volumes afterward, including when tests fail. It preserves a failing test exit
-status so CI can detect failures. You can also run the script directly:
+volumes afterward, including when tests fail. It starts the API and database in
+the background and runs the test client separately to completion, preserving
+its exit status. An API crash cannot stop the client early and produce a false
+success. You can also run the script directly:
 
 ```sh
 ./build/test-black-box.sh
 ```
+
+Cleanup also removes the automatically named database and test-client images
+with `docker compose down --rmi local`. Standalone runs remove
+`orders-api:blackbox`; runs using `ORDERS_API_IMAGE` preserve the supplied API
+image for publication or reuse. Docker build cache is retained.
 
 `build/build.sh` (also used by `make build`) builds the application once, resolves
 its commit-specific tag to a local image ID, and passes that ID to the runner through
@@ -60,7 +67,9 @@ shellcheck build/build.sh build/test-black-box.sh build/tests/*.bats
 To run Compose directly and keep the stopped containers for inspection:
 
 ```sh
-docker compose -p orders-blackbox -f src/Tests/BlackBox/docker-compose.tests.yaml up --build --abort-on-container-exit --exit-code-from orders_api_tests
+docker compose -p orders-blackbox -f src/Tests/BlackBox/docker-compose.tests.yaml build
+docker compose -p orders-blackbox -f src/Tests/BlackBox/docker-compose.tests.yaml up -d --no-build --pull never orders_test_pg_db orders_test_api
+docker compose -p orders-blackbox -f src/Tests/BlackBox/docker-compose.tests.yaml run --rm --no-deps --pull never -T orders_api_tests
 ```
 
 Compose starts a disposable PostgreSQL database, the application image, and the
@@ -77,8 +86,8 @@ docker compose -p orders-blackbox -f src/Tests/BlackBox/docker-compose.tests.yam
 
 The database uses temporary container storage, with no host ports or shared
 development database volume. Tests create unique orders and do not depend on
-seeded IDs or the total number of orders. Delete is not covered yet because its
-endpoint is still unimplemented; created data is discarded with the test database.
+seeded IDs or the total number of orders. Delete is not covered yet; created
+data is discarded with the test database.
 
 To test an already built application image directly:
 

@@ -56,8 +56,8 @@ public static class OrderEndpoints
     public static async Task<Results<NoContent, BadRequest, ProblemHttpResult>> DeleteOrderAsync(
         Guid id, IOrderHandler handler, CancellationToken cancellationToken = default)
     {
-        return TypedResults.Problem(
-            statusCode: StatusCodes.Status501NotImplemented,
-            title: "GetOrderAsync not implemented");
+        await handler.DeleteOrderAsync(id, cancellationToken);
+
+        return TypedResults.NoContent();
     }
 }

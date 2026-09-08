@@ -9,10 +9,33 @@ COMPOSE_FILE="${PROJ_ROOT}/src/Tests/BlackBox/docker-compose.tests.yaml"
 cleanup() {
     local status=$?
     local cleanup_status=0
+    local image_cleanup_status=0
     trap - EXIT
 
     docker compose -p orders-blackbox -f "${COMPOSE_FILE}" \
         down --volumes --remove-orphans || cleanup_status=$?
+
+    # Restrict image cleanup to supporting services so supplied API images survive.
+    docker compose -p orders-blackbox -f - down --rmi local <<'COMPOSE' || image_cleanup_status=$?
+services:
+  orders_test_pg_db:
+    build: .
+  orders_api_tests:
+    build: .
+COMPOSE
+
+    if [ "${cleanup_status}" -eq 0 ]; then
+        cleanup_status=${image_cleanup_status}
+    fi
+
+    # A failed build may never have produced the standalone API image.
+    if [ -z "${ORDERS_API_IMAGE:-}" ] && docker image inspect orders-api:blackbox >/dev/null 2>&1; then
+        image_cleanup_status=0
+        docker image rm orders-api:blackbox || image_cleanup_status=$?
+        if [ "${cleanup_status}" -eq 0 ]; then
+            cleanup_status=${image_cleanup_status}
+        fi
+    fi
 
     if [ "${status}" -eq 0 ]; then
         status=${cleanup_status}
@@ -50,13 +73,17 @@ main() {
     if [ -n "${ORDERS_API_IMAGE:-}" ]; then
         docker compose -p orders-blackbox -f "${COMPOSE_FILE}" \
             build orders_test_pg_db orders_api_tests
+    else
         docker compose -p orders-blackbox -f "${COMPOSE_FILE}" \
-            up --no-build --pull never --abort-on-container-exit --exit-code-from orders_api_tests
-        return 0
+            build
     fi
 
     docker compose -p orders-blackbox -f "${COMPOSE_FILE}" \
-        up --build --abort-on-container-exit --exit-code-from orders_api_tests
+        up --detach --no-build --pull never orders_test_pg_db orders_test_api
+
+    # Let the test client finish and report its own status even if the API exits.
+    docker compose -p orders-blackbox -f "${COMPOSE_FILE}" \
+        run --rm --no-deps --pull never -T orders_api_tests
 }
 
 main "$@"

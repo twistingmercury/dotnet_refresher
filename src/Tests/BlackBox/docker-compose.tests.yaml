@@ -14,6 +14,7 @@ services:
     image: ${ORDERS_API_IMAGE:-orders-api:blackbox}
     environment:
       ASPNETCORE_URLS: http://+:8080
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
       ConnectionStrings__DefaultConnection: Host=orders_test_pg_db;Port=5432;Database=orders;Username=ordersUser;Password=ordersPass
     depends_on:
       orders_test_pg_db:
@@ -25,6 +26,7 @@ services:
       dockerfile: src/Tests/BlackBox/Dockerfile
     environment:
       ORDERS_API_BASE_URL: http://orders_test_api:8080
+      DOTNET_USE_POLLING_FILE_WATCHER: "1"
     depends_on:
       orders_test_api:
         condition: service_started

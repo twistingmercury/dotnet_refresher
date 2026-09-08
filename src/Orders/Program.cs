@@ -27,8 +27,6 @@ public class Program
             options.SwaggerEndpoint("/openapi/v1.json", "v1");
         });
 
-        app.MapGet("/", () => "Hello World!");
-
         app.MapOrderEvents();
 
         app.Run();
