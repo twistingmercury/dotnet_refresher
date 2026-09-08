@@ -1,0 +1,5 @@
+apiVersion: v2
+name: envoy
+description: Envoy reverse proxy for the Orders API
+type: application
+version: 0.1.0

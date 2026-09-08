@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: envoy
+  namespace: {{ .Release.Namespace  }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: envoy
+  template:
+    metadata:
+      labels:
+        app: envoy
+    spec:
+      containers:
+      - name: envoy
+        image: envoyproxy/envoy:v1.39-latest
+        args:
+          - "-c"
+          - "/etc/envoy/envoy.yaml"
+        ports:
+          - name: http
+            containerPort: 8080
+        readinessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        volumeMounts:
+          - name: config
+            mountPath: /etc/envoy
+            readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: envoy-config
+
