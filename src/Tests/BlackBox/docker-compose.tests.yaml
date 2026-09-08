@@ -1,60 +1,30 @@
 services:
   orders_test_pg_db:
-    image: ghcr.io/twistingmercury/orders-postgres:test
-    container_name: orders_test_pg_db
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ordersUser
-      POSTGRES_PASSWORD: ordersPass
-    ports:
-      - "6532:5432"
-    networks:
-      - order_bb_tests_network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ordersUser -d postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-
+    build:
+      context: ../../../database
+      dockerfile: Dockerfile
+    tmpfs:
+      - /var/lib/postgresql
 
   orders_test_api:
-    image: ghcr.io/twistingmercury/orders:local-build
-    container_name: orders_test_api
-    restart: never
-    ports:
-      - "3034:8080"
+    build:
+      context: ../../..
+      dockerfile: build/Dockerfile
+      target: final
+    image: ${ORDERS_API_IMAGE:-orders-api:blackbox}
     environment:
       ASPNETCORE_URLS: http://+:8080
-      DB_USER: ordersUser
-      DB_PASS: ordersPass
-      DOTNET_USE_POLLING_FILE_WATCHER: 1
-    networks:
-      - order_bb_tests_network
+      ConnectionStrings__DefaultConnection: Host=orders_test_pg_db;Port=5432;Database=orders;Username=ordersUser;Password=ordersPass
     depends_on:
-      - orders_pg_db
-
+      orders_test_pg_db:
+        condition: service_healthy
 
   orders_api_tests:
     build:
-      context: .
-      dockerfile: build/Dockerfile
-    image: ghcr.io/twistingmercury/orders_bb_tests:local-build
-    container_name: orders_api_tests
-    restart: never
-    ports:
-      - "8080:8080"
+      context: ../../..
+      dockerfile: src/Tests/BlackBox/Dockerfile
     environment:
-      ASPNETCORE_URLS: http://+:8080
-      DB_USER: ordersUser
-      DB_PASS: ordersPass
-      DOTNET_USE_POLLING_FILE_WATCHER: 1
-    networks:
-      - orders_network
+      ORDERS_API_BASE_URL: http://orders_test_api:8080
     depends_on:
-      - orders_pg_db
-      - orders_test_api
-
-networks:
-  order_bb_tests_network:
-    driver: bridge
+      orders_test_api:
+        condition: service_started

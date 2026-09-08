@@ -1,4 +1,4 @@
-.PHONY: run build analyze compose help
+.PHONY: run build analyze compose help test-blackbox
 
 GIT_COMMIT := $(shell git rev-parse --short=8 HEAD 2>/dev/null || echo "unknown")
 GIT_TAG    := $(shell git describe --tags --abbrev=0 2>/dev/null || echo "dev")
@@ -17,6 +17,9 @@ analyze: ## Run dotnet analysis and local build. No image is built.
 
 compose: ## Runs docker compose to build and run the app locally in a container.
 	@docker compose up
+
+test-blackbox: ## Build and run black-box tests in containers, then remove test containers and volumes.
+	@./build/test-black-box.sh
 
 build: ## Build the application using the same script that is used for the CI build.
 	@LOCAL=1 ./build/build.sh

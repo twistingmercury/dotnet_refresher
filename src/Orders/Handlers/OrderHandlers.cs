@@ -7,6 +7,8 @@ namespace Orders.Handlers;
 
 public interface IOrderHandler
 {
+    Task<OrderResponse[]> GetAllOrdersAsync();
+
     Task<OrderResponse?> GetOrderAsync(Guid orderId, CancellationToken cancellationToken);
 
     Task<OrderResponse?> CreateOrderAsync(
@@ -15,29 +17,43 @@ public interface IOrderHandler
     Task DeleteOrderAsync(Guid orderId, CancellationToken cancellationToken = default);
 }
 
+
 public class OrderHandler(OrderDbContext dbContext) : IOrderHandler
 {
+
+    public async Task<OrderResponse[]> GetAllOrdersAsync()
+    {
+        var orders = await dbContext.Orders
+        .AsNoTracking()
+        .Include(order => order.Details)
+        .ToArrayAsync();
+
+        return orders.Select(order => new OrderResponse(
+          order.OrderId,
+          order.CustomerName,
+          order.Details.Select(detail => new OrderLineItem(
+              detail.ProductName,
+              detail.Qty))
+              .ToArray()))
+          .ToArray();
+    }
+
     public async Task<OrderResponse?> GetOrderAsync(Guid orderId, CancellationToken cancellationToken)
     {
         var order = await dbContext.Orders
             .AsNoTracking()
+            .Include(order => order.Details)
             .SingleOrDefaultAsync(o => o.OrderId == orderId, cancellationToken);
 
         if (order is null) return null;
 
-        var details = await dbContext.Details
-            .AsNoTracking()
-            .Where(detail => detail.OrderId == orderId)
-            .OrderBy(detail => detail.LineNumber)
-            .Select(detail => new OrderLineItem(
-                detail.ProductName,
-                detail.Qty))
-            .ToListAsync(cancellationToken);
-
         return new OrderResponse(
             order.OrderId,
             order.CustomerName,
-            details);
+            order.Details.Select(detail => new OrderLineItem(
+              detail.ProductName,
+              detail.Qty))
+              .ToArray());
     }
 
     public async Task<OrderResponse?> CreateOrderAsync(
@@ -60,8 +76,10 @@ public class OrderHandler(OrderDbContext dbContext) : IOrderHandler
             orderId,
             createRequest.CustomerName,
             timestamp,
-            timestamp,
-            details);
+            timestamp)
+        {
+            Details = details.ToList()
+        };
 
         dbContext.Orders.Add(order);
         dbContext.Details.AddRange(details);

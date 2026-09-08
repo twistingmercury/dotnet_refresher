@@ -2,13 +2,18 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0.400-alpine3.24 AS build
 
 WORKDIR /src
 COPY src/Orders/ ./Orders/
+COPY src/Tests/Unit/ ./Tests/Unit/
 WORKDIR /src/Orders
 
 RUN dotnet restore
+RUN dotnet restore /src/Tests/Unit/Orders.Tests.Unit.csproj
 RUN dotnet format --verify-no-changes --no-restore
+RUN dotnet format /src/Tests/Unit/Orders.Tests.Unit.csproj --verify-no-changes --no-restore
 RUN dotnet build --no-restore --configuration Release -warnaserror
-RUN dotnet test --no-build --configuration Release
+RUN dotnet build /src/Tests/Unit/Orders.Tests.Unit.csproj --no-restore --configuration Release -warnaserror
+RUN dotnet test /src/Tests/Unit/Orders.Tests.Unit.csproj --no-build --no-restore --configuration Release
 RUN dotnet package list --no-restore --vulnerable --include-transitive
+RUN dotnet package list --project /src/Tests/Unit/Orders.Tests.Unit.csproj --no-restore --vulnerable --include-transitive
 RUN dotnet publish \
     --no-restore \
     --configuration Release \

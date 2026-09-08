@@ -8,9 +8,4 @@ public class OrderDbContext(DbContextOptions<OrderDbContext> options) : DbContex
     public DbSet<OrderDto> Orders => Set<OrderDto>();
 
     public DbSet<OrderDetailDto> Details => Set<OrderDetailDto>();
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
-    }
 }

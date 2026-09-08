@@ -11,8 +11,6 @@ on:
 
 permissions:
   contents: read
-  actions: write
-  packages: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -22,6 +20,9 @@ jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
@@ -30,6 +31,7 @@ jobs:
           fetch-depth: 0
 
       - name: Log in to Container Registry
+        if: github.ref == 'refs/heads/develop' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         uses: docker/login-action@v4
         with:
           registry: ghcr.io
@@ -37,13 +39,19 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run containerized build
+        id: build
         run: LOCAL=0 ./build/build.sh
 
       - name: Push image tags
+        if: github.ref == 'refs/heads/develop' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+        env:
+          IMAGE_TAGS: ${{ steps.build.outputs.image_tags }}
+        shell: bash
         run: |
-          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo 'dev')
-          docker push ghcr.io/twistingmercury/orders:latest
-          docker push ghcr.io/twistingmercury/orders:${VERSION}
-         
-  
-    
+          if [[ -z "${IMAGE_TAGS}" ]]; then
+            printf '%s\n' 'Error: the build did not report any image tags.' >&2
+            exit 1
+          fi
+          while IFS= read -r image; do
+            docker push "${image}"
+          done <<< "${IMAGE_TAGS}"

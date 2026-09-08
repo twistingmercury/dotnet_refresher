@@ -12,11 +12,19 @@ public static class OrderEndpoints
             .MapGroup("/orders")
             .WithTags("Orders");
 
+        groups.MapGet("/get", GetAllOrdersAsync);
         groups.MapGet("/get/{id:guid}", GetOrderAsync);
         groups.MapPost("/create", CreateOrderAsync);
         groups.MapDelete("/delete/{id:guid}", DeleteOrderAsync);
 
         return endpoints;
+    }
+
+    public static async Task<Results<Ok<OrderResponse[]>, BadRequest, NotFound, ProblemHttpResult>> GetAllOrdersAsync(
+        IOrderHandler handler, CancellationToken cancellationToken = default)
+    {
+        var response = await handler.GetAllOrdersAsync();
+        return TypedResults.Ok(response);
     }
 
     public static async Task<Results<Ok<OrderResponse>, BadRequest, NotFound, ProblemHttpResult>> GetOrderAsync(

@@ -1,16 +1,28 @@
+
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
 namespace Orders.DataAccess.DTOs;
 
+[Table("orders")]
 public sealed record OrderDto(
-    Guid OrderId,
-    string CustomerName,
-    DateTimeOffset CreatedDate,
-    DateTimeOffset UpdatedDate,
-    IReadOnlyList<OrderDetailDto> Details);
+    [property: Key, Column("order_id")] Guid OrderId,
+    [property: Column("customer_name")] string CustomerName,
+    [property: Column("created_date")] DateTimeOffset CreatedDate,
+    [property: Column("updated_date")] DateTimeOffset UpdatedDate)
+{
+    [ForeignKey(nameof(OrderDetailDto.OrderId))]
+    public ICollection<OrderDetailDto> Details { get; init; }
+        = new List<OrderDetailDto>();
+}
 
+[Table("order_details")]
+[PrimaryKey(nameof(OrderId), nameof(LineNumber))]
 public sealed record OrderDetailDto(
-    Guid OrderId,
-    int LineNumber,
-    string ProductName,
-    int Qty,
-    DateTimeOffset CreatedDate,
-    DateTimeOffset UpdatedDate);
+    [property: Column("order_id")] Guid OrderId,
+    [property: Column("line_number")] int LineNumber,
+    [property: Column("product_name")] string ProductName,
+    [property: Column("qty")] int Qty,
+    [property: Column("created_date")] DateTimeOffset CreatedDate,
+    [property: Column("updated_date")] DateTimeOffset UpdatedDate);
