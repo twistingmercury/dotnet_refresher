@@ -1,0 +1,60 @@
+services:
+  orders_test_pg_db:
+    image: ghcr.io/twistingmercury/orders-postgres:test
+    container_name: orders_test_pg_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ordersUser
+      POSTGRES_PASSWORD: ordersPass
+    ports:
+      - "6532:5432"
+    networks:
+      - order_bb_tests_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ordersUser -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+
+  orders_test_api:
+    image: ghcr.io/twistingmercury/orders:local-build
+    container_name: orders_test_api
+    restart: never
+    ports:
+      - "3034:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      DB_USER: ordersUser
+      DB_PASS: ordersPass
+      DOTNET_USE_POLLING_FILE_WATCHER: 1
+    networks:
+      - order_bb_tests_network
+    depends_on:
+      - orders_pg_db
+
+
+  orders_api_tests:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    image: ghcr.io/twistingmercury/orders_bb_tests:local-build
+    container_name: orders_api_tests
+    restart: never
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      DB_USER: ordersUser
+      DB_PASS: ordersPass
+      DOTNET_USE_POLLING_FILE_WATCHER: 1
+    networks:
+      - orders_network
+    depends_on:
+      - orders_pg_db
+      - orders_test_api
+
+networks:
+  order_bb_tests_network:
+    driver: bridge

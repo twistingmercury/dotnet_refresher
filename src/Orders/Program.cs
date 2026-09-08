@@ -13,8 +13,6 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddOpenApi();
 
-
-
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
         builder.Services.AddDbContextPool<OrderDbContext>(options =>

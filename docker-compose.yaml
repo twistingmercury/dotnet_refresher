@@ -1,24 +1,6 @@
 services:
-  orders_api:
-    build:
-      context: .
-      dockerfile: build/Dockerfile
-    image: ghcr.io/twistingmercury/orders:local-build
-    restart: unless-stopped
-    ports:
-      - "3033:8080"
-    environment:
-      ASPNETCORE_URLS: http://+:8080
-      DB_USER: ordersUser
-      DB_PASS: ordersPass
-      DOTNET_USE_POLLING_FILE_WATCHER: 1
-    networks:
-      - orders_network
-    depends_on:
-      - orders_pg_db
-      
   orders_pg_db:
-    image: postgres:18.6-alpine3.24
+    image: ghcr.io/twistingmercury/orders-postgres:test
     container_name: orders_pg_db
     restart: unless-stopped
     environment:
@@ -37,6 +19,26 @@ services:
       timeout: 5s
       retries: 5
       start_period: 15s
+
+      
+  orders_api:
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    image: ghcr.io/twistingmercury/orders:local-build
+    restart: unless-stopped
+    ports:
+      - "3033:8080"
+    environment:
+      ASPNETCORE_URLS: http://+:8080
+      DB_USER: ordersUser
+      DB_PASS: ordersPass
+      DOTNET_USE_POLLING_FILE_WATCHER: 1
+    networks:
+      - orders_network
+    depends_on:
+      - orders_pg_db
+    
 
 volumes:
   postgres_data:
