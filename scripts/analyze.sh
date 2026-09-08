@@ -13,11 +13,15 @@ dotnet format "${SRC_ROOT}"/Orders.csproj \
 
 printf "\n%s\n" "Checking for published vulnerabilities..."
 dotnet package list \
-    --project ${SRC_ROOT}/Orders.csproj \
+    --project "${SRC_ROOT}/Orders.csproj" \
     --no-restore \
     --vulnerable \
     --include-transitive \
     --verbosity detailed
+
+printf "\n%s\n" "Running unit tests..."
+dotnet test "${PROJ_ROOT}/src/Tests/Unit/Orders.Tests.Unit.csproj" \
+    --configuration Debug
 
 printf "\n%s\n"  "Checking for compiler warnings..."
 dotnet build "${SRC_ROOT}" \
